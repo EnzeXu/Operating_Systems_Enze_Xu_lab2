@@ -39,6 +39,7 @@ The shell is in a loop, prompting the user for input and executing the command. 
 $ cd xxx/Operating_Systems_Enze_Xu_lab2
 $ cc Enze_Xu_lab2.c -o lab2
 $ ./lab2
+$ [Enjoy your time!]
 ```
 
 ****
