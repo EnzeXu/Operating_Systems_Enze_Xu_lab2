@@ -2,6 +2,11 @@ CSC-641 - Lab 2 - EnzeXu
 ===========================
 This document is used to show the detailed description of each part in lab2.
 
+See at `https://github.com/EnzeXu/Operating_Systems_Enze_Xu_lab2` or
+```shell
+$ git clone https://github.com/EnzeXu/Operating_Systems_Enze_Xu_lab2.git
+```
+
 ****
  
 | Project Name | Operating Systems - Lab2 |
