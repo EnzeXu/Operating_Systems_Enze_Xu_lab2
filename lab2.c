@@ -13,10 +13,14 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <pwd.h>
 
 #define MAXN 10000
 
 void quitHandler(int);
+char * getMainPath(void);
+char * getUserName(void);
+
 
 void printArgv(char *argv[]) { // test print function
 	int i = 0;
@@ -33,7 +37,7 @@ void commandExecute(char *line) {
 	char commandFullBin[MAXN];
 	char commandFullUsrBin[MAXN];
 	char commandFull[MAXN];
-	char pathUser[MAXN] = "/home/csuser/";
+	//char pathUser[MAXN] = "/home/csuser/";
 	int argc = 0;
 	char *argv[MAXN];
 	char *token;
@@ -71,15 +75,22 @@ void commandExecute(char *line) {
 	if (argc == 0) return; // empty command, do nothing, just print the prompt again
 
 	// deal with cd command
+	char pathUser[MAXN] = "";
 	if(strcmp(argv[0], "cd") == 0) {
 		if (argv[1] == NULL) return;
 		if (argv[1][0] == '~') {
-		argv[1][0] = '/';
-		char tmpPath[MAXN];
-		strcpy(tmpPath, pathUser);
-				strcat(tmpPath, argv[1]);
-		strcpy(argv[1], tmpPath);
-		// printf("newpath: %s\n", argv[1]);
+			argv[1][0] = '/';
+			char tmpPath[MAXN];
+			char pathHead[MAXN] = "/home/";
+			char pathTail[MAXN] = "/";
+			strcat(pathUser, pathHead);
+			strcat(pathUser, getUserName());
+			strcat(pathUser, pathTail);
+			// printf("pathUser: %s\n", pathUser);
+			strcpy(tmpPath, pathUser);
+			strcat(tmpPath, argv[1]);
+			strcpy(argv[1], tmpPath);
+			// printf("newpath: %s\n", argv[1]);
 		}
 		int chdir_return = chdir(argv[1]);
 		if (chdir_return ==  -1) perror("cd");
@@ -136,6 +147,11 @@ char mainPath[MAXN];
 char * getMainPath(void) {
 	getcwd(mainPath, sizeof(mainPath));
 	return mainPath;
+}
+
+char * getUserName(void) { // mine is "/home/csuser/" but if Professor try other user...emmm...anyway, let me figure it out
+	struct passwd *pwd = getpwuid(getuid());
+	return pwd->pw_name;
 }
 
 int main(){
