@@ -1,5 +1,5 @@
 //
-//  main.c
+//  prog2.c
 //  prog2
 //
 //  Created by ENZE XU on 2021/9/25.
@@ -14,11 +14,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#define MAXN 1000
+#define MAXN 10000
 
 void quitHandler(int);
 
-void printArgv(char *argv[]) {
+void printArgv(char *argv[]) { // test print function
 	int i = 0;
 	while(argv[i] != NULL) {
 		printf("argv[%d] %s (length = %ld)\n", i, argv[i], strlen(argv[i]));
@@ -52,7 +52,7 @@ void commandExecute(char *line) {
 	else if (argv[argc - 1][strlen(argv[argc - 1]) - 1] == 10) argv[argc - 1][strlen(argv[argc - 1]) - 1] = '\0';
 
 	// printf("argc = %d\n", argc);
-	if (argc == 0) return;
+	if (argc == 0) return; // empty command, do nothing, just print the prompt again
 	int flagBackgroundExecution = 0;
 	if (argv[argc - 1][strlen(argv[argc - 1]) - 1] == '&') {
 		flagBackgroundExecution = 1;
@@ -68,17 +68,9 @@ void commandExecute(char *line) {
 	}
 	else argv[argc] = NULL;
 
-	if (argc == 0) return;
+	if (argc == 0) return; // empty command, do nothing, just print the prompt again
 
-	// printf("argc = %d\n", argc);
-	// printArgv(argv);
-
-	strcpy(commandFullBin, commandPathBin);
-	strcat(commandFullBin, argv[0]);
-	strcpy(commandFullUsrBin, commandPathUsrBin);
-	strcat(commandFullUsrBin, argv[0]);
-
-	// deal with cd
+	// deal with cd command
 	if(strcmp(argv[0], "cd") == 0) {
 		if (argv[1] == NULL) return;
 		if (argv[1][0] == '~') {
@@ -94,6 +86,11 @@ void commandExecute(char *line) {
 		return;
 	}
 
+	// check if the command is available
+	strcpy(commandFullBin, commandPathBin);
+	strcat(commandFullBin, argv[0]);
+	strcpy(commandFullUsrBin, commandPathUsrBin);
+	strcat(commandFullUsrBin, argv[0]);
 	
 	if (access(commandFullBin, F_OK) == 0) {
 		// strcpy(commandFull, commandFullBin);
@@ -110,7 +107,7 @@ void commandExecute(char *line) {
 	}
 	
 
-	
+	// fork
 	pid_t pid, wait_pid;
 	int status;
 	pid = fork();
@@ -124,7 +121,7 @@ void commandExecute(char *line) {
 		}
 	}
 
-	if (flagBackgroundExecution == 1) {
+	if (flagBackgroundExecution == 1) { // iff receive an '&', skip waitpid
 		printf("\033[32m[Enze Shell] child pid = %d\033[0m\n", pid);
 		return ;
 	}
@@ -142,12 +139,12 @@ char * getMainPath(void) {
 }
 
 int main(){
-	signal(SIGINT, quitHandler);
+	signal(SIGINT, quitHandler); // signal handler used to ignore Ctrl-C
 	time_t t;
 	time(&t);
 	printf("\033[32m[Enze Shell] version: v1.0\033[0m\n", ctime(&t));
-	printf("\033[32m[Enze Shell] pid = %d\033[0m\n", getpid());
-	printf("\033[32m[Enze Shell] start at (GMT) %s\033[0m", ctime(&t));
+	printf("\033[32m[Enze Shell] pid = %d\033[0m\n", getpid()); // if execute lab2 in lab2, can help to identify
+	printf("\033[32m[Enze Shell] start at (GMT) %s\033[0m", ctime(&t)); // GMT time
 	while(1) {
 		char line[MAXN];
 		printf("\033[34m%s\033[37m %% ", getMainPath());
@@ -168,7 +165,7 @@ int main(){
 	return 0;
 }
 
-void quitHandler(int theInt) {
+void quitHandler(int theInt) { // signal handler used to ignore Ctrl-C
 	//fflush(stdin);
 	//printf("\n[Enze Shell] Not QUITTING (SIGINT = %d)\n", theInt);
 	//printf("\n%s %% ", getMainPath());
